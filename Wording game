@@ -1,0 +1,65 @@
+from numpy import random
+import time
+
+
+def intro():
+	print("Randomize game! ")
+	time.sleep(0.1)
+	print("Ready ! ")
+	print()
+	time.sleep(0.1)
+	print("Ready !! ")
+	print()
+	time.sleep(0.1)
+	print("Ready !!! ")
+	print()
+
+
+def picknum_1():
+	print("Pick one lucky number! ")
+	set_1 = int(input("Pick the first number!: "))
+
+	while set_1 < 1 or set_1 > 11:
+		try:
+			set_1 = int(input("Pick better number between 1~11: "))
+		except ValueError:
+			print("We need number, friend ")
+	return set_1
+
+
+def picknum_2():
+	print("Pick one lucky number! ")
+	set_2 = int(input("Pick the second number!: "))
+
+	while set_2 < 1 or set_2 > 11:
+		try:
+			set_2 = int(input("Pick better number between 1~11: "))
+		except ValueError:
+			print("We need number, friend ")
+
+	return set_2
+
+
+def com(rand1, rand2):
+	guess_1 = random.randint(100, size=(rand1))
+	guess_2 = random.randint(100, size=(rand2))
+	print(guess_1)
+	print(guess_2)
+
+	for a in guess_1:
+		for b in guess_2:
+			if a == b:
+				print(a)
+			else:
+				continue
+
+
+playAgain = "yes"
+while playAgain == "yes" or playAgain == "y":
+	intro()
+	pick_1 = picknum_1()
+	pick_2 = picknum_2()
+	com(pick_1, pick_2)
+
+	print("Wonderful experience, Do you wish to try again?")
+	playAgain = input()
