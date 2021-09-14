@@ -1,0 +1,106 @@
+import tkinter as tk
+import pandas as pd
+from tkinter import filedialog, messagebox, ttk
+
+# Input new entry
+def submit_fields():
+    path = (r"C:\\Users\\Peng\\Desktop\\t\\StudentData.xlsx")
+    df1 = pd.read_excel(path)
+    SeriesA = df1['Name']
+    SeriesB = df1['Handphone_Number']
+    A = pd.Series(entry1.get())
+    B = pd.Series(entry2.get())
+    SeriesA = SeriesA.append(A)
+    SeriesB = SeriesB.append(B)
+###### Transfer to Excel
+    df2 = pd.DataFrame({"Name":SeriesA, "Handphone_Number":SeriesB})
+    df2.to_excel(path, index=False)
+    entry1.delete(0, tk.END)
+    entry2.delete(0, tk.END)
+
+#Set the frame size and properties
+root = tk.Tk()
+root.geometry("500x500")
+root.pack_propagate(False)
+root.resizable(0, 0)
+
+#frame 1 for new input
+frame1=tk.Label(root, text="PhoneBook", fg="blue").grid(row=0)
+frame1=tk.Label(root, text="Name").grid(row=1)
+frame1=tk.Label(root, text="Handphone_Number").grid(row=2)
+#frame 2 for view excel
+frame2=tk.LabelFrame(root, text="Opened File")
+frame2.place(height=250, width=400, rely=0.20, relx=0.05)
+
+#Tell python Entry where the place, put input
+entry1= tk.Entry(root)
+entry2= tk.Entry(root)
+
+#tell python the location of entry
+entry1.grid(row=1, column=1)
+entry2.grid(row=2, column=1)
+
+#tell python the button function and location
+B1=tk.Button(root, text='Quit', command=root.quit).grid(row=5,column=5,padx=0)
+B2=tk.Button(root, text='Submit', command=submit_fields).grid(row=5,column=4,padx=0)
+B3=tk.Button(root, text='Browse', command=lambda: File_dialog()).grid(row=5,column=2,pady=0)
+B4=tk.Button(root, text='Load', command=lambda: Load_excel_data()).grid(row=5,column=3,pady=0)
+
+
+### Tree View ##
+tv2 = ttk.Treeview(frame2)
+tv2.place(relheight=1, relwidth=1)
+
+#tell python set the scroll function in frame 2 after browse the in put
+treescrolly = tk.Scrollbar(frame2, orient="vertical", command=tv2.yview)
+treescrollx = tk.Scrollbar(frame2, orient="horizontal", command=tv2.xview)
+tv2.configure(xscrollcommand=treescrollx.set, yscrollcommand=treescrolly.set)
+treescrollx.pack(side="bottom", fill="x")
+treescrolly.pack(side="right", fill="y")
+
+def File_dialog():
+    """This Function will open the file explorer and assign the chosen file path to label_file"""
+    # syntax> smth = filedialog.askopenfilename(initialdir="/",title="Select A File",filetype=(("xlsx.files", "*.xlsx"), ("All Files", "*.*")))
+    filename = filedialog.askopenfilename(initialdir="/",
+                                          title="Select A File",
+                                          #at least 2 type file type put in
+                                          filetype=(("xlsx.files", "*.xlsx"), ("All Files", "*.*")))
+    #frame[selected file] = Pick selected file
+    frame2["text"] = filename
+    return None
+
+def Load_excel_data():
+    """If the file selected is valid this will load the file into the Treeview"""
+    file_path = frame2["text"]
+    try:
+        excel_filename = r"{}".format(file_path)
+        if excel_filename[-4:] == ".csv":
+            df = pd.read_csv(excel_filename)
+        else:
+            df = pd.read_excel(excel_filename)
+
+    except ValueError:
+        tk.messagebox.showerror("Information", "The file you have chosen is invalid")
+        return None
+    except FileNotFoundError:
+        tk.messagebox.showerror("Information", f"No such file as {file_path}")
+        return None
+
+    #display treeview["column"] = to make dataframe colume to list format ( e.g : [(a,1),(b,2)] )
+    tv2["column"] = list(df.columns)
+    # display tree["show"] = "heading" This is the syntax option to display row of header to treeview
+    tv2["show"] = "headings"
+    for column in tv2["columns"]:
+        tv2.heading(column, text=column) # let the column heading = column name
+
+    df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
+    for row in df_rows:
+        tv2.insert("", "end", values=row) # inserts each list into the treeview. For parameters see https://docs.python.org/3/library/tkinter.ttk.html#tkinter.ttk.Treeview.insert
+    return None
+
+
+def clear_data():
+    tv2.delete(*tv2.get_children())
+    return None
+
+root.mainloop()
