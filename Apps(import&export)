@@ -4,7 +4,7 @@ from tkinter import filedialog, messagebox, ttk
 
 # Input new entry
 def submit_fields():
-    path = (r"C:\\Users\\Peng\\Desktop\\t\\StudentData.xlsx")
+    path = (r"C:\\Users\\username\\Desktop\\t\\StudentData.xlsx")
     df1 = pd.read_excel(path)
     SeriesA = df1['Name']
     SeriesB = df1['Handphone_Number']
